@@ -1,16 +1,16 @@
 {
   "countries": [
     {
-      "name": "Morocco",
-      "capital": "Rabat",
-      "population": "37M",
-      "cities": ["Casablanca", "Marrakesh", "Fes"]
+      "name": "المغرب",
+      "capital": "الرباط",
+      "continent": "أفريقيا",
+      "description": "بلد جميل يحتوي على مدن سياحية مثل مراكش وأكادير."
     },
     {
-      "name": "Spain",
-      "capital": "Madrid",
-      "population": "48M",
-      "cities": ["Barcelona", "Valencia", "Seville"]
+      "name": "فرنسا",
+      "capital": "باريس",
+      "continent": "أوروبا",
+      "description": "وجهة سياحية مشهورة بمدينة باريس وبرج إيفل."
     }
   ]
 }
