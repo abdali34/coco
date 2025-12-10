@@ -1,23 +1,23 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-    <meta charset="UTF-8" />
-    <title>خطط السفر</title>
+    <meta charset="UTF-8">
+    <title>البحث عن دولة</title>
     <style>
         body {
             font-family: Tahoma, sans-serif;
-            background: #f3f3f3;
+            background: #f2f2f2;
             margin: 0;
             padding: 20px;
         }
 
         .container {
-            max-width: 500px;
+            max-width: 550px;
             margin: auto;
-            background: white;
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            background: #fff;
+            padding: 25px;
+            border-radius: 14px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.1);
         }
 
         h1 {
@@ -25,20 +25,36 @@
             color: #333;
         }
 
-        select {
+        input {
             width: 100%;
             padding: 12px;
-            margin-top: 10px;
+            margin-top: 12px;
             border-radius: 8px;
             border: 1px solid #aaa;
             font-size: 16px;
         }
 
+        button {
+            width: 100%;
+            margin-top: 12px;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 16px;
+            border: none;
+            background: #0077ff;
+            color: white;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #0053c9;
+        }
+
         .info-box {
-            margin-top: 20px;
+            margin-top: 25px;
+            padding: 18px;
             background: #fafafa;
             border: 1px solid #ddd;
-            padding: 15px;
             border-radius: 10px;
             display: none;
         }
@@ -46,16 +62,25 @@
         .info-box p {
             margin: 6px 0;
         }
+
+        .not-found {
+            margin-top: 15px;
+            color: red;
+            text-align: center;
+            display: none;
+        }
     </style>
 </head>
 
 <body>
-    <div class="container">
-        <h1>اختر دولة</h1>
 
-        <select id="countrySelect">
-            <option value="">-- اختر دولة --</option>
-        </select>
+    <div class="container">
+        <h1>البحث عن دولة</h1>
+
+        <input type="text" id="searchInput" placeholder="اكتب اسم دولة (مثال: المغرب)">
+        <button onclick="searchCountry()">بحث</button>
+
+        <p class="not-found" id="notFound">لم يتم العثور على أي دولة بهذا الاسم.</p>
 
         <div class="info-box" id="infoBox">
             <h3 id="countryName"></h3>
@@ -66,34 +91,49 @@
     </div>
 
     <script>
+        let countriesData = [];
+
+        // قراءة ملف JSON
         fetch("./data.json")
             .then(res => res.json())
             .then(data => {
-                const select = document.getElementById("countrySelect");
-
-                data.countries.forEach(c => {
-                    const opt = document.createElement("option");
-                    opt.value = c.name;
-                    opt.textContent = c.name;
-                    select.appendChild(opt);
-                });
-
-                select.addEventListener("change", () => {
-                    const selected = data.countries.find(x => x.name === select.value);
-                    const box = document.getElementById("infoBox");
-
-                    if (selected) {
-                        document.getElementById("countryName").textContent = selected.name;
-                        document.getElementById("capital").textContent = selected.capital;
-                        document.getElementById("continent").textContent = selected.continent || "غير متوفر";
-                        document.getElementById("desc").textContent = selected.description || "لا يوجد وصف";
-
-                        box.style.display = "block";
-                    } else {
-                        box.style.display = "none";
-                    }
-                });
+                countriesData = data.countries;
             });
+
+        // دالة البحث
+        function searchCountry() {
+            let input = document.getElementById("searchInput").value.trim();
+            let notFound = document.getElementById("notFound");
+            let box = document.getElementById("infoBox");
+
+            notFound.style.display = "none";
+            box.style.display = "none";
+
+            if (input === "") {
+                notFound.textContent = "يرجى كتابة اسم الدولة.";
+                notFound.style.display = "block";
+                return;
+            }
+
+            // بحث غير حساس لحالة الأحرف ويدعم جزئية الاسم
+            let result = countriesData.find(c =>
+                c.name.includes(input) || c.name.toLowerCase().includes(input.toLowerCase())
+            );
+
+            if (!result) {
+                notFound.textContent = "لم يتم العثور على أي دولة.";
+                notFound.style.display = "block";
+                return;
+            }
+
+            document.getElementById("countryName").textContent = result.name;
+            document.getElementById("capital").textContent = result.capital || "غير متوفر";
+            document.getElementById("continent").textContent = result.continent || "غير متوفر";
+            document.getElementById("desc").textContent = result.description || "لا يوجد وصف";
+
+            box.style.display = "block";
+        }
     </script>
+
 </body>
 </html>
