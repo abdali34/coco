@@ -1,0 +1,6 @@
+{
+  "countries": [
+    { "name": "Morocco", "capital": "Rabat" },
+    { "name": "Spain", "capital": "Madrid" }
+  ]
+}

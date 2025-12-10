@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <title>Travel Plans</title>
+</head>
+<body>
+
+<h1>البلدان المتوفرة</h1>
+<div id="list"></div>
+
+<script>
+  fetch('./data.json')
+    .then(res => res.json())
+    .then(data => {
+      let html = "";
+      data.countries.forEach(c => {
+        html += <p><strong>${c.name}</strong> — العاصمة: ${c.capital}</p>;
+      });
+      document.getElementById("list").innerHTML = html;
+    });
+</script>
+
+</body>
+</html>
