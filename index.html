@@ -1,23 +1,89 @@
 <!DOCTYPE html>
-<html>
+<html lang="ar" dir="rtl">
 <head>
-    <meta charset="UTF-8" />
+    <meta charset="UTF-8">
     <title>Travel Plans</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            padding: 20px;
+            background: #f2f2f2;
+        }
+        h1 {
+            text-align: center;
+        }
+        select {
+            padding: 10px;
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+        .card {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+    </style>
 </head>
 <body>
 
-<h1>البلدان المتوفرة</h1>
-<div id="list"></div>
+<h1>اختر دولة للحصول على معلوماتها</h1>
+
+<select id="countrySelect">
+    <option value="">— اختر دولة —</option>
+</select>
+
+<div id="info"></div>
 
 <script>
-  fetch('./data.json')
-    .then(res => res.json())
-    .then(data => {
-      let html = "";
-      data.countries.forEach(c => {
-        html += <p><strong>${c.name}</strong> — العاصمة: ${c.capital}</p>;
-      });
-      document.getElementById("list").innerHTML = html;
+    // تحميل البيانات من JSON
+    let allData = {};
+
+    fetch('./data.json')
+        .then(res => res.json())
+        .then(data => {
+            allData = data;
+
+            // ملء القائمة بالدول
+            const select = document.getElementById('countrySelect');
+            data.countries.forEach(country => {
+                let option = document.createElement('option');
+                option.value = country.name;
+                option.textContent = country.name;
+                select.appendChild(option);
+            });
+        });
+
+    // عند اختيار دولة
+    document.getElementById('countrySelect').addEventListener('change', function() {
+        const selected = this.value;
+        const infoDiv = document.getElementById('info');
+
+        if (selected === "") {
+            infoDiv.innerHTML = "";
+            return;
+        }
+
+        // جلب معلومات الدولة المختارة
+        const country = allData.countries.find(c => c.name === selected);
+
+        if (!country) {
+            infoDiv.innerHTML = "<p>لم يتم العثور على معلومات.</p>";
+            return;
+        }
+
+        infoDiv.innerHTML = `
+            <div class="card">
+                <h2>${country.name}</h2>
+                <p><strong>العاصمة:</strong> ${country.capital}</p>
+                <p><strong>عدد السكان:</strong> ${country.population || "غير متوفر"}</p>
+                <p><strong>المدن المشهورة:</strong></p>
+                <ul>
+                    ${country.cities ? country.cities.map(city => <li>${city}</li>).join("") : "لا توجد بيانات"}
+                </ul>
+            </div>
+        `;
     });
 </script>
 
