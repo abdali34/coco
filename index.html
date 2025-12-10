@@ -1,91 +1,99 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <title>Travel Plans</title>
+    <meta charset="UTF-8" />
+    <title>خطط السفر</title>
     <style>
         body {
-            font-family: sans-serif;
+            font-family: Tahoma, sans-serif;
+            background: #f3f3f3;
+            margin: 0;
             padding: 20px;
-            background: #f2f2f2;
         }
+
+        .container {
+            max-width: 500px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
         h1 {
             text-align: center;
+            color: #333;
         }
+
         select {
-            padding: 10px;
-            font-size: 18px;
-            margin-bottom: 20px;
+            width: 100%;
+            padding: 12px;
+            margin-top: 10px;
+            border-radius: 8px;
+            border: 1px solid #aaa;
+            font-size: 16px;
         }
-        .card {
-            background: white;
+
+        .info-box {
+            margin-top: 20px;
+            background: #fafafa;
+            border: 1px solid #ddd;
             padding: 15px;
             border-radius: 10px;
-            margin-top: 20px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            display: none;
+        }
+
+        .info-box p {
+            margin: 6px 0;
         }
     </style>
 </head>
+
 <body>
+    <div class="container">
+        <h1>اختر دولة</h1>
 
-<h1>اختر دولة للحصول على معلوماتها</h1>
+        <select id="countrySelect">
+            <option value="">-- اختر دولة --</option>
+        </select>
 
-<select id="countrySelect">
-    <option value="">— اختر دولة —</option>
-</select>
+        <div class="info-box" id="infoBox">
+            <h3 id="countryName"></h3>
+            <p><strong>العاصمة:</strong> <span id="capital"></span></p>
+            <p><strong>القارة:</strong> <span id="continent"></span></p>
+            <p><strong>وصف:</strong> <span id="desc"></span></p>
+        </div>
+    </div>
 
-<div id="info"></div>
+    <script>
+        fetch("./data.json")
+            .then(res => res.json())
+            .then(data => {
+                const select = document.getElementById("countrySelect");
 
-<script>
-    // تحميل البيانات من JSON
-    let allData = {};
+                data.countries.forEach(c => {
+                    const opt = document.createElement("option");
+                    opt.value = c.name;
+                    opt.textContent = c.name;
+                    select.appendChild(opt);
+                });
 
-    fetch('./data.json')
-        .then(res => res.json())
-        .then(data => {
-            allData = data;
+                select.addEventListener("change", () => {
+                    const selected = data.countries.find(x => x.name === select.value);
+                    const box = document.getElementById("infoBox");
 
-            // ملء القائمة بالدول
-            const select = document.getElementById('countrySelect');
-            data.countries.forEach(country => {
-                let option = document.createElement('option');
-                option.value = country.name;
-                option.textContent = country.name;
-                select.appendChild(option);
+                    if (selected) {
+                        document.getElementById("countryName").textContent = selected.name;
+                        document.getElementById("capital").textContent = selected.capital;
+                        document.getElementById("continent").textContent = selected.continent || "غير متوفر";
+                        document.getElementById("desc").textContent = selected.description || "لا يوجد وصف";
+
+                        box.style.display = "block";
+                    } else {
+                        box.style.display = "none";
+                    }
+                });
             });
-        });
-
-    // عند اختيار دولة
-    document.getElementById('countrySelect').addEventListener('change', function() {
-        const selected = this.value;
-        const infoDiv = document.getElementById('info');
-
-        if (selected === "") {
-            infoDiv.innerHTML = "";
-            return;
-        }
-
-        // جلب معلومات الدولة المختارة
-        const country = allData.countries.find(c => c.name === selected);
-
-        if (!country) {
-            infoDiv.innerHTML = "<p>لم يتم العثور على معلومات.</p>";
-            return;
-        }
-
-        infoDiv.innerHTML = `
-            <div class="card">
-                <h2>${country.name}</h2>
-                <p><strong>العاصمة:</strong> ${country.capital}</p>
-                <p><strong>عدد السكان:</strong> ${country.population || "غير متوفر"}</p>
-                <p><strong>المدن المشهورة:</strong></p>
-                <ul>
-                    ${country.cities ? country.cities.map(city => <li>${city}</li>).join("") : "لا توجد بيانات"}
-                </ul>
-            </div>
-        `;
-    });
-</script>
-
+    </script>
 </body>
 </html>
